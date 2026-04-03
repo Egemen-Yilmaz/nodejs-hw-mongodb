@@ -1,4 +1,5 @@
-import { getAllContacts, getContactById } from '../services/contact.js';
+import { getAllContacts, getContactById, createContact, updateContact, deleteContact } from '../services/contact.js';
+import createError from 'http-errors';
 
 // Tüm rehberi getiren kontrolör
 export const getContactsController = async (req, res) => {
@@ -28,4 +29,41 @@ export const getContactByIdController = async (req, res) => {
     message: `Successfully found contact with id ${contactId}!`,
     data: contact,
   });
+};
+
+// Yeni bir rehber oluşturan kontrolör
+export const createContactController = async (req, res) => {
+    const contact = await createContact(req.body);
+
+    res.status(201).json({
+        status: 201,
+        message: 'Contact created successfully!',
+        data: contact,
+    });
+};
+
+export const patchContactController = async (req, res, next) => {
+    const { contactId } = req.params;
+    const result = await updateContact(contactId, req.body);
+
+    if (!result.contact) {
+        throw createError(404, 'Contact not found');
+    }
+
+    res.json({
+        status: 200,
+        message: 'Successfully updated contact!',
+        data: result.contact,
+    });
+};
+
+export const deleteContactController = async (req, res, next) => {
+    const { contactId } = req.params;
+    const contact = await deleteContact(contactId);
+
+    if (!contact) {
+        throw createError(404, 'Contact not found');
+    }
+
+    res.status(200).send();
 };
