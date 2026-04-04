@@ -1,9 +1,15 @@
-import { getAllContacts, getContactById, createContact, updateContact, deleteContact } from '../services/contact.js';
 import createError from 'http-errors';
+import { getAllContacts, 
+  getContactById, 
+  createContact, 
+  updateContact, 
+  deleteContact 
+} from '../services/contact.js';
+
 
 // Tüm rehberi getiren kontrolör
 export const getContactsController = async (req, res) => {
-  const contacts = await getAllContacts();
+    const contacts = await getAllContacts();
 
   res.status(200).json({
     status: 200,
@@ -18,10 +24,7 @@ export const getContactByIdController = async (req, res) => {
   const contact = await getContactById(contactId);
 
   if (!contact) {
-    res.status(404).json({
-      message: 'Contact not found',
-    });
-    return;
+    throw createError(404, `Contact with id ${contactId} not found!`);
   }
 
   res.status(200).json({
@@ -37,7 +40,7 @@ export const createContactController = async (req, res) => {
 
     res.status(201).json({
         status: 201,
-        message: 'Contact created successfully!',
+        message: 'Contact created a contact!',
         data: contact,
     });
 };
@@ -52,7 +55,7 @@ export const patchContactController = async (req, res, next) => {
 
     res.json({
         status: 200,
-        message: 'Successfully updated contact!',
+        message: 'Successfully patched a contact!',
         data: result.contact,
     });
 };
@@ -65,5 +68,5 @@ export const deleteContactController = async (req, res, next) => {
         throw createError(404, 'Contact not found');
     }
 
-    res.status(200).send();
+    res.status(204).send();
 };
