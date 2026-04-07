@@ -5,17 +5,34 @@ import { getAllContacts,
   updateContact, 
   deleteContact 
 } from '../services/contact.js';
+import { parsePaginationParams } from '../utils/parsePaginationParams.js';
+import { parseSortParams } from '../utils/parseSortParams.js';
+import { parseFilterParams } from '../utils/parseFilterParams.js';
 
 
 // Tüm rehberi getiren kontrolör
 export const getContactsController = async (req, res) => {
-    const contacts = await getAllContacts();
 
-  res.status(200).json({
-    status: 200,
-    message: 'Successfully found contacts!',
-    data: contacts,
-  });
+    // 1. Query parametrelerini parse et (temizle ve varsayılan değerleri uygula)
+    const { page, perPage } = parsePaginationParams(req.query);
+    const { sortBy, sortOrder } = parseSortParams(req.query);
+    const filter = parseFilterParams(req.query); // Favori/Tür filtrelemesi için
+
+    // 2. Servis katmanına temizlenmiş parametreleri gönder
+    const contacts = await getAllContacts({
+        page,
+        perPage,
+        sortBy,
+        sortOrder,
+        filter,
+    });
+
+    // 3. Yanıtı uygun formatta döndürür
+    res.status(200).json({
+        status: 200,
+        message: 'Successfully found contacts!',
+        data: contacts, // Servisten gelen paketlenmiş veri (data, page, perPage, totalItems, totalPages, hasPreviousPage, hasNextPage)
+    });
 };
 
 // ID ile tekil getiren kontrolör

@@ -1,8 +1,42 @@
 import { Contact } from '../db/contacts.js';
 
-export const getAllContacts = async () => {
-    const contacts = await Contact.find();
-    return contacts;
+export const getAllContacts = async ({
+    page = 1,
+    perPage = 10,
+    sortBy = 'name',
+    sortOrder = 'asc',
+    filter = {}
+}) => {
+    const limit = perPage;
+    const skip = (page - 1) * perPage;
+
+    const contactsQuery = Contact.find();
+
+    // Filtreleme
+    if (filter.contactType) contactsQuery.where('contactType').equals(filter.contactType);
+    if (filter.isFavourite !== undefined) contactsQuery.where('isFavourite').equals(filter.isFavourite);
+
+    // Toplam öğe sayısınıı ve veriyi paralel çekiyoruz (Performans için)
+    const [totalItems, data] = await Promise.all([
+        Contact.find().merge(contactsQuery).countDocuments(), // Toplam öğe sayısı
+        contactsQuery
+            .skip(skip)
+            .limit(limit)
+            .sort({ [sortBy]: sortOrder }) // Sıralama
+            .exec(), // Sorguyu çalıştır
+    ]);
+
+    const totalPages = Math.ceil(totalItems / perPage);
+
+    return {
+        data,
+        page,
+        perPage,
+        totalItems,
+        totalPages,
+        hasPreviousPage: page > 1,
+        hasNextPage: page < totalPages,
+    };
 };
 
 export const getContactById = async (contactId) => {
