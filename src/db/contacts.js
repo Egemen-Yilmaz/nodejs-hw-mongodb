@@ -23,6 +23,11 @@ const contactSchema = new Schema(
       required: true,
       default: 'personal',
     },
+    userId: {
+      type: Schema.Types.ObjectId,
+      ref: 'user', // users koleksiyonuna referans veriyoruz
+      required: true,
+    },
   },
   {
     timestamps: true,

@@ -53,7 +53,10 @@ export const getContactByIdController = async (req, res) => {
 
 // Yeni bir rehber oluşturan kontrolör
 export const createContactController = async (req, res) => {
-    const contact = await createContact(req.body);
+    const contact = await createContact({
+        ...req.body,
+        userId: req.user._id, // authenticate middleware'inden gelen kullanıcı ID'sini ekliyoruz
+    });
 
     res.status(201).json({
         status: 201,
