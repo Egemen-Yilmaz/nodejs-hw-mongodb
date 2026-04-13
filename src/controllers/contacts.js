@@ -25,6 +25,7 @@ export const getContactsController = async (req, res) => {
         sortBy,
         sortOrder,
         filter,
+        userId: req.user._id, // authenticate middleware'inden gelen kullanıcı ID'sini ekliyoruz
     });
 
     // 3. Yanıtı uygun formatta döndürür
