@@ -19,7 +19,7 @@ export const getAllContacts = async ({
 
     // Toplam öğe sayısınıı ve veriyi paralel çekiyoruz (Performans için)
     const [totalItems, data] = await Promise.all([
-        Contact.countDocuments/{ userId, ...filter}, // Toplam öğe sayısı
+        Contact.countDocuments({ userId, ...filter}), // Toplam öğe sayısı
         contactsQuery
             .skip(skip)
             .limit(limit)
