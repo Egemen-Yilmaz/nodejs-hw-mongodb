@@ -3,6 +3,7 @@ import { Contact } from '../db/contacts.js';
 export const getAllContacts = async ({
     page = 1,
     perPage = 10,
+    userId,
     sortBy = 'name',
     sortOrder = 'asc',
     filter = {}
@@ -10,7 +11,7 @@ export const getAllContacts = async ({
     const limit = perPage;
     const skip = (page - 1) * perPage;
 
-    const contactsQuery = Contact.find();
+    const contactsQuery = Contact.find({ userId }); // Sadece kullanıcının kendi rehberini çekiyoruz
 
     // Filtreleme
     if (filter.contactType) contactsQuery.where('contactType').equals(filter.contactType);
@@ -39,8 +40,9 @@ export const getAllContacts = async ({
     };
 };
 
-export const getContactById = async (contactId) => {
-    const contact = await Contact.findById(contactId);
+export const getContactById = async (contactId, userId) => {
+    // Sadece ID yetmez, sahibi de kontrol edilmeli!
+    const contact = await Contact.findById({ _id: contactId, userId });
     return contact;
 };
 
