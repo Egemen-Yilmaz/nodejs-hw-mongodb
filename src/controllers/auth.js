@@ -1,6 +1,18 @@
 
-import { loginUser, refreshUserSession } from "../services/auth.js";
+import { loginUser, refreshUserSession, registerUser, logoutUser } from "../services/auth.js";
 
+// 1. Kayıt Kontrolörü
+export const registerUserController = async (req, res, next) => {
+    const user = await registerUser(req.body);
+
+    res.status(201).json({
+        status: 201,
+        message: 'User registered successfully!',
+        data: user,
+    });
+};
+
+// 2. Giriş Kontrolörü
 export const loginUserController = async (req, res, next) => {
     const session = await loginUser(req.body.email, req.body.password);
 
@@ -19,6 +31,7 @@ export const loginUserController = async (req, res, next) => {
     });
 };
 
+// 3. Oturum Yenileme Kontrolörü
 export const refreshUserSessionController = async (req, res, next) => {
     const session = await refreshUserSession({
         refreshToken: req.cookies.refreshToken,
@@ -39,6 +52,7 @@ export const refreshUserSessionController = async (req, res, next) => {
     });
 };
 
+// 4. Çıkış Kontrolörü
 export const logoutUserController = async (req, res, next) => {
     if (req.cookies.refreshToken) {
         await logoutUser(req.cookies.refreshToken);
