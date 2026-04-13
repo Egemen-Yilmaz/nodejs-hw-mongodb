@@ -34,7 +34,7 @@ export const loginUser = async (email, password) => {
     });
 };
 
-export const registerUser = async (userData) => {
+export const registerUser = async (payload) => {
     // eposta kullanımda mı?
     const user = await UserCollection.findOne({ email: payload.email });
     if (user) throw createHttpError(409, 'Email is already in use!');
