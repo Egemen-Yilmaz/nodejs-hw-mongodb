@@ -17,7 +17,7 @@ const userSchema = new Schema({
 }, { timestamps: true });
 
 // Şifreyi yanıtlarda gizlemek için toJSON metodunu özelleştiriyoruz
-userSchema.method.toJSON = function() {
+userSchema.methods.toJSON = function() {
     const obj = this.toObject();
     delete obj.password; // Parolayı JSON çıktısından kaldır
     return obj;
