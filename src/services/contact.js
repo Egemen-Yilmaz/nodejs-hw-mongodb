@@ -42,7 +42,7 @@ export const getAllContacts = async ({
 
 export const getContactById = async (contactId, userId) => {
     // Sadece ID yetmez, sahibi de kontrol edilmeli!
-    const contact = await Contact.findById({ _id: contactId, userId });
+    const contact = await Contact.findOne({ _id: contactId, userId });
     return contact;
 };
 
@@ -51,9 +51,9 @@ export const createContact = async (payload) => {
     return newContact;
 };
 
-export const updateContact = async (contactId, payload, options = {}) => {
+export const updateContact = async (contactId, userId, payload, options = {}) => {
     const rawResult = await Contact.findOneAndUpdate(
-        { _id: contactId },
+        { _id: contactId, userId },
         payload,
         { 
             new: true, // Güncellenmiş veriyi dön
@@ -62,6 +62,8 @@ export const updateContact = async (contactId, payload, options = {}) => {
         },
     );
 
+    if (!rawResult || !rawResult.value) return null; // Kayıt bulunamazsa null döner
+
     return {
         contact: rawResult.value, // Güncellenmiş contact
         isNew: Boolean(rawResult.lastErrorObject.upserted), // true ise yeni bir kayıt oluşturulmuş, false ise güncelleme yapılmış
@@ -69,9 +71,10 @@ export const updateContact = async (contactId, payload, options = {}) => {
 };
 
 
-export const deleteContact = async (contactId) => {
+export const deleteContact = async (contactId, userId) => {
     const contact = await Contact.findOneAndDelete({
         _id: contactId,
+        userId, // Sadece sahibi silebilir
     });
 
     return contact;

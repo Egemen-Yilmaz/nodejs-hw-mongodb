@@ -37,9 +37,10 @@ export const getContactsController = async (req, res) => {
 };
 
 // ID ile tekil getiren kontrolör
-export const getContactByIdController = async (req, res) => {
+export const getContactByIdController = async (req, res, next) => {
   const { contactId } = req.params;
-  const contact = await getContactById(contactId);
+  const userId = req.user._id; // authenticate middleware'inden gelen kullanıcı ID'si
+  const contact = await getContactById(contactId, userId);
 
   if (!contact) {
     throw createError(404, `Contact with id ${contactId} not found!`);
@@ -68,9 +69,11 @@ export const createContactController = async (req, res) => {
 
 export const patchContactController = async (req, res, next) => {
     const { contactId } = req.params;
-    const result = await updateContact(contactId, req.body);
+    const userId = req.user._id; // authenticate middleware'inden gelen kullanıcı ID'si
 
-    if (!result.contact) {
+    const result = await updateContact(contactId, userId, req.body);
+
+    if (!result || !result.contact) {
         throw createError(404, 'Contact not found');
     }
 
@@ -83,7 +86,8 @@ export const patchContactController = async (req, res, next) => {
 
 export const deleteContactController = async (req, res, next) => {
     const { contactId } = req.params;
-    const contact = await deleteContact(contactId);
+    const userId = req.user._id; // authenticate middleware'inden gelen kullanıcı ID'si
+    const contact = await deleteContact(contactId, userId);
 
     if (!contact) {
         throw createError(404, 'Contact not found');
