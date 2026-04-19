@@ -8,6 +8,7 @@ import { getAllContacts,
 import { parsePaginationParams } from '../utils/parsePaginationParams.js';
 import { parseSortParams } from '../utils/parseSortParams.js';
 import { parseFilterParams } from '../utils/parseFilterParams.js';
+import { saveFileToCloudinary } from '../utils/saveFileToCloudinary.js';
 
 
 // Tüm rehberi getiren kontrolör
@@ -55,9 +56,18 @@ export const getContactByIdController = async (req, res, next) => {
 
 // Yeni bir rehber oluşturan kontrolör
 export const createContactController = async (req, res) => {
+    const userId = req.user._id;
+    let photoUrl = null;
+
+    // Eğer kullanıcı bir fotoğraf yüklediyse
+    if (req.file) {
+        photoUrl = await saveFileToCloudinary(req.file);
+    }
+
     const contact = await createContact({
         ...req.body,
         userId: req.user._id, // authenticate middleware'inden gelen kullanıcı ID'sini ekliyoruz
+        photo: photoUrl, // Fotoğraf linkini modele ekliyoruz
     });
 
     res.status(201).json({
@@ -70,8 +80,16 @@ export const createContactController = async (req, res) => {
 export const patchContactController = async (req, res, next) => {
     const { contactId } = req.params;
     const userId = req.user._id; // authenticate middleware'inden gelen kullanıcı ID'si
+    let photoUrl = null;
 
-    const result = await updateContact(contactId, userId, req.body);
+    if (req.file) {
+        photoUrl = await saveFileToCloudinary(req.file);
+    }
+
+    const result = await updateContact(contactId, userId, {
+        ...req.body,
+        photo: photoUrl || undefined, // Fotoğraf varsa güncelle yoksa dokunma
+    });
 
     if (!result || !result.contact) {
         throw createError(404, 'Contact not found');

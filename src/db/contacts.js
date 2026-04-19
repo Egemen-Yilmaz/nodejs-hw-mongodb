@@ -28,6 +28,7 @@ const contactSchema = new Schema(
       ref: 'user', // users koleksiyonuna referans veriyoruz
       required: true,
     },
+    photo: { type: String }, // Resim url'i burada tutuluyor
   },
   {
     timestamps: true,
