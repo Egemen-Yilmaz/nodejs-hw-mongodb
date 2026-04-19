@@ -1,5 +1,5 @@
 
-import { loginUser, refreshUserSession, registerUser, logoutUser } from "../services/auth.js";
+import { loginUser, refreshUserSession, registerUser, logoutUser, requestResetToken, resetPassword } from "../services/auth.js";
 
 // 1. Kayıt Kontrolörü
 export const registerUserController = async (req, res, next) => {
@@ -63,3 +63,26 @@ export const logoutUserController = async (req, res, next) => {
 
     res.status(204).send();
 };
+
+export const sendResetEmailController = async (req, res, next) => {
+    await requestResetToken(req.body.email);
+
+    res.status(200).json({
+        status: 200,
+        message: 'Reset password email has been successfully sent.',
+        data: {},
+    });
+};
+
+
+export const resetPasswordController = async (req,res) => {
+    // Body'den token ve yeni password gelecek
+    await resetPassword(req.body);
+
+    res.status(200).json({
+        status: 200,
+        message: 'Password has been seccssesfully reset.',
+        data: {},
+    });
+};
+
