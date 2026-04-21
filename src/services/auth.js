@@ -97,8 +97,6 @@ export const requestResetToken = async (email) => {
         { expiresIn: '5m' }
     );
 
-    console.log("İŞTE ARADIĞIN TOKEN:", resetToken);
-
     const resetUrl = `${env('APP_DOMAIN')}/reset-password?token=${resetToken}`;
 
     try {
