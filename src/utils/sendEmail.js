@@ -1,22 +1,28 @@
-import axios from 'axios';
+import nodemailer from 'nodemailer';
 import { env } from './env.js';
 
 export const sendEmail = async (options) => {
+  const transporter = nodemailer.createTransport({
+    host: env('SMTP_HOST'),
+    port: Number(env('SMTP_PORT')),
+    auth: {
+      user: env('SMTP_USER'),
+      pass: env('SMTP_PASSWORD'), // .env'de güncelleyeceğimiz şifre
+    },
+  });
+
+  const mailOptions = {
+    from: env('SMTP_FROM'),
+    to: options.to,
+    subject: options.subject,
+    html: options.html,
+  };
+
   try {
-    const response = await axios.post('https://api.brevo.com/v3/smtp/email', {
-      sender: { name: "Egemen App", email: env('SMTP_FROM') },
-      to: [{ email: options.to }],
-      subject: options.subject,
-      htmlContent: options.html
-    }, {
-      headers: {
-        'api-key': env('BREVO_API_KEY'), // .env'deki xkeysib ile başlayan anahtar
-        'Content-Type': 'application/json'
-      }
-    });
-    return response.data;
+    const result = await transporter.sendMail(mailOptions);
+    return result;
   } catch (error) {
-    console.error("BREVO API HATASI:", error.response?.data || error.message);
+    console.error("NODEMAILER HATASI:", error.message);
     throw error;
   }
 };
