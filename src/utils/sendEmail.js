@@ -9,6 +9,9 @@ export const sendEmail = async (options) => {
       user: env('SMTP_USER'),
       pass: env('SMTP_PASSWORD'), // .env'de güncelleyeceğimiz şifre
     },
+    tls: {
+    rejectUnauthorized: false // Sertifika hatalarını görmezden gelmek için
+  }
   });
 
   const mailOptions = {
